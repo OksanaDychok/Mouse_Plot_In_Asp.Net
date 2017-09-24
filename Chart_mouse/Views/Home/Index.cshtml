@@ -1,0 +1,84 @@
+﻿<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+@model Chart_mouse.Models.SessionViewModel
+@using Highsoft.Web.Mvc.Charts
+@using MvcCheckBoxList.Model
+
+@(Html.Highsoft().Highcharts(
+        new Highcharts
+        {
+            Title = new Title
+            {
+                Text = "Statictics of tumor size",
+                X = -20
+            },
+            XAxis = new List<XAxis>
+            {
+                new XAxis
+                {
+                    Categories = ViewBag.plotx,
+                }
+            },
+            YAxis = new List<YAxis>
+            {
+                new YAxis
+                {
+                    Title = new YAxisTitle
+                    {
+                        Text = "Average tumor size"
+                    },
+                    PlotLines = new List<YAxisPlotLines>
+                    {
+                            new YAxisPlotLines
+                        {
+                            Value = 0,
+                            Width = 1,
+                            Color = "#808080"
+                        }
+                    }
+                }
+            },
+            Legend = new Legend
+            {
+                Layout = LegendLayout.Vertical,
+                Align = LegendAlign.Right,
+                VerticalAlign = LegendVerticalAlign.Middle,
+                BorderWidth = 0
+            },
+            Series = new List<Series>
+            {
+                new LineSeries
+                {
+                    Name = ViewBag.groupName,
+                    Data = ViewBag.plotyData as List<LineSeriesData>
+                },
+            }
+        }
+        , "chart")
+)
+
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        <div class="dropdown">
+            @Html.DropDownList("Name", (SelectList)(ViewBag.SelectedGroups), new { @onchange = "this.form.submit();" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="checkbox checkbox-primary">
+            @Html.CheckBoxListFor(model => model.PostedSessions.SessionNames,
+                                  model => model.AvailableSessions,
+                                  session => session.SessionDate,
+                                  session => session.SessionDate,
+                                  model => model.SelectedSessions,
+                                  Position.Vertical)
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+           <input type="submit" value="Update plot" class="btn btn-default" />
+        </div>
+    </div>
+}
